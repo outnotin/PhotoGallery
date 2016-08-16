@@ -1,5 +1,6 @@
 package com.augmentis.ayp.photogallery;
 
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,15 +32,26 @@ public class PhotoGalleryFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private FlickrFetcher mFlickrFetcher;
     private PhotoGalleryAdapter mAdapter;
+    private List<GalleryItem> mItem;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.photo_gallery_recyvler_view);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.photo_gallery_recycler_view);
+        Resources r = getResources();
+        int gridSize  = r.getInteger(R.integer.gridSize);
 
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),gridSize));
+        mItem = new ArrayList<>();
+        mRecyclerView.setAdapter(new PhotoGalleryAdapter(mItem));
 
 
         mFlickrFetcher = new FlickrFetcher();
