@@ -57,8 +57,14 @@ public class PhotoGalleryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+//        Log.d(TAG, "Start intent service");
+//        Intent i = PollService.newIntent(getActivity());
+//        getActivity().startService(i);
+//        PollService.setServiceAlarm(getContext(), true);
 
         Log.d(TAG, "Memory size = " + maxMemory + " K");
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -125,6 +131,7 @@ public class PhotoGalleryFragment extends Fragment {
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.mnu_search);
         final SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setQuery(mSearchKey, false);//
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -150,6 +157,14 @@ public class PhotoGalleryFragment extends Fragment {
             }
         });
 
+        //render polling
+        MenuItem mnuPolling = menu.findItem(R.id.mnu_toggle_polling);
+        if(PollService.isServiceAlarmOn(getActivity())){
+            mnuPolling.setTitle(R.string.stop_polling);
+        }else {
+            mnuPolling.setTitle(R.string.start_polling);
+        }
+
     }
 
     @Override
@@ -157,6 +172,13 @@ public class PhotoGalleryFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.mnu_reload:
                 loadPhoto();
+                return true;
+            case R.id.mnu_toggle_polling:
+//                Log.d(TAG, "Start/Stop intent service");
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                Log.d(TAG, ((shouldStartAlarm) ? "Start" : "Stop") + " Intent service");
+                PollService.setServiceAlarm(getContext(), shouldStartAlarm);
+                getActivity().invalidateOptionsMenu(); // refresh menu
                 return true;
             case R.id.mnu_clear_search:
                 mSearchKey = null;
