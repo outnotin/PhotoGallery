@@ -24,18 +24,14 @@ public class ThumbnailDownloader<T> extends HandlerThread {
 
     private Handler mResponseHandler;
 
-    private ThumbnailDownloaderListener<T> mThumbnailDownloaderListerner;
+    private ThumbnailDownloaderListener<T> mThumbnailDownloaderListener;
 
     interface ThumbnailDownloaderListener<T>{
-        void onThumbnailDownloaded(T target, Bitmap thumbnail);
-    }
-
-    public void clearQueue(){
-        mRequestHandler.removeMessages(DOWNLOAD_FILE);
+        void onThumbnailDownloaded(T target, Bitmap thumbnail, String url);
     }
 
     public void setThumbnailDownloadListener(ThumbnailDownloaderListener<T> thumbnailDownloaderListener){
-        mThumbnailDownloaderListerner = thumbnailDownloaderListener;
+        mThumbnailDownloaderListener = thumbnailDownloaderListener;
     }
 
     public ThumbnailDownloader(Handler mUIHandler) {
@@ -60,6 +56,10 @@ public class ThumbnailDownloader<T> extends HandlerThread {
         };
     }
 
+    public void clearQueue(){
+        mRequestHandler.removeMessages(DOWNLOAD_FILE);
+    }
+
     private void handlerRequestDownload(final T target,final String url){
         try {
             if(url == null){
@@ -78,13 +78,13 @@ public class ThumbnailDownloader<T> extends HandlerThread {
                     }
                     //url is ok(the same one)
                     mRequestUrlMap.remove(target);
-                    mThumbnailDownloaderListerner.onThumbnailDownloaded(target, bitmap);
+                    mThumbnailDownloaderListener.onThumbnailDownloaded(target, bitmap, url);
                 }
             });
 
             Log.i(TAG, "BitMap url downloaded : ");
-        }catch (IOException ior){
-            Log.e(TAG, "Error doenloading");
+        }catch (IOException ioe){
+            Log.e(TAG, "Error doenloading", ioe);
         }
     }
 
@@ -95,9 +95,9 @@ public class ThumbnailDownloader<T> extends HandlerThread {
             mRequestUrlMap.remove(target);
         }else{
             mRequestUrlMap.put(target, url);
-        }
 
-        Message msg = mRequestHandler.obtainMessage(DOWNLOAD_FILE, target); //get message from handler
-        msg.sendToTarget(); //send to handler
+            Message msg = mRequestHandler.obtainMessage(DOWNLOAD_FILE, target); //get message from handler
+            msg.sendToTarget(); //send to handler
+        }
     }
 }

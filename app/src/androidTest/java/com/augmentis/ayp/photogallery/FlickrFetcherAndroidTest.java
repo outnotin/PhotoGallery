@@ -2,6 +2,7 @@ package com.augmentis.ayp.photogallery;
 
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
@@ -21,6 +23,7 @@ import static org.junit.Assert.*;
 @SmallTest
 public class FlickrFetcherAndroidTest {
 
+    private static final String TAG = "FTest";
     private FlickrFetcher mFlickrFetcher;
 
     @org.junit.Before
@@ -36,16 +39,22 @@ public class FlickrFetcherAndroidTest {
     }
 
     @Test
-    public void testFetch() throws Exception{
-        String json = mFlickrFetcher.fetchItem();
-        assertThat(json, containsString("perpage"));
+    public void testSearch() throws Exception{
+        List<GalleryItem> galleryItemList = new ArrayList<>();
+        mFlickrFetcher.searchPhotos(galleryItemList, "bird");
+
+        Log.d(TAG, "testSearch : size = " + galleryItemList.size());
+        assertThat(galleryItemList.size(), not(0));
     }
 
     @Test
-    public void testFetchList() throws Exception{
+    public void testGetRecent() throws Exception{
         List<GalleryItem> galleryItemList = new ArrayList<>();
-        mFlickrFetcher.fetchItem(galleryItemList);
+        mFlickrFetcher.getRecentPhotos(galleryItemList);
 
-        assertThat(galleryItemList.size(), is(100));
+        Log.d(TAG, "testGetRecent : size = " + galleryItemList.size());
+        assertThat(galleryItemList.size(), not(0));
     }
+
+
 }
