@@ -7,7 +7,9 @@ public class GalleryItem {
     private String id;
     private String title;
     private String url;
-    
+    private String bigSizeUrl;
+
+
     public static void printHello(){
         System.out.println("Hello");
     }
@@ -52,5 +54,13 @@ public class GalleryItem {
             return that.id != null && id != null && that.id.equals(id);
         }
         return false;
+    }
+
+    public void setBigSizeUrl(String bigSizeUrl) {
+        this.bigSizeUrl = bigSizeUrl;
+    }
+
+    public String getBigSizeUrl() {
+        return bigSizeUrl;
     }
 }

@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,7 @@ import java.util.List;
  */
 public class PhotoGalleryFragment extends Fragment {
     private static final String TAG = "PhotoGalleryFragment";
+    private static final String DIALOG_IMAGE = "DialogImage";
 
     public static PhotoGalleryFragment newInstance() {
 
@@ -49,6 +52,7 @@ public class PhotoGalleryFragment extends Fragment {
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloaderThread;
     private FetcherTask mFetcherTask;
     private String mSearchKey;
+    private String photoUrl;
 
     private LruCache<String, Bitmap> mMemoryCache;
     final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -199,23 +203,49 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
 
-    class PhotoHolder extends RecyclerView.ViewHolder {
+    class PhotoHolder extends RecyclerView.ViewHolder{
 
         private ImageView mPhoto;
+        private String mUrl;
+
 
         public PhotoHolder(View itemView) {
             super(itemView);
             mPhoto = (ImageView) itemView.findViewById(R.id.image_photo);
+            mPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG, " holder onclick");
+                    FragmentManager fm = getFragmentManager();
+                    DialogImage di = DialogImage.newInstance(mUrl);
+                    di.show(fm, DIALOG_IMAGE);
+                }
+            });
         }
 
         public void bindDrawable(@NonNull Drawable drawable) {
             mPhoto.setImageDrawable(drawable);
         }
+
+        public void setUrl(String _photoUrl){
+            mUrl = _photoUrl;
+        }
+
+//        @Override
+//        public void onClick(View view) {
+//            Log.d(TAG, " holder onclick");
+//            FragmentManager fm = getFragmentManager();
+//            DialogImage di = DialogImage.newInstance(photoUrl);
+//            di.show(fm, DIALOG_IMAGE);
+//
+//
+//        }
     }
 
-    class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoHolder> {
+    class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoHolder>{
 
         List<GalleryItem> mGalleryItemList;
+
 
         PhotoGalleryAdapter(List<GalleryItem> galleryItems) {
             mGalleryItemList = galleryItems;
@@ -225,11 +255,20 @@ public class PhotoGalleryFragment extends Fragment {
         public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(getActivity()).inflate(
                     R.layout.item_photo, parent, false);
+//            v.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Log.d(TAG, " holder onclick");
+//                    FragmentManager fm = getFragmentManager();
+//                    DialogImage di = DialogImage.newInstance(photoUrl);
+//                    di.show(fm, DIALOG_IMAGE);
+//                }
+//            });
             return new PhotoHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(PhotoHolder holder, int position) {
+        public void onBindViewHolder(PhotoHolder holder, int position)  {
 //            holder.bindDrawable(mGalleryItemList.get(position));
             Drawable loadDrawable =
                     ResourcesCompat.getDrawable(getResources(), R.drawable.loading_move, null);
@@ -238,6 +277,8 @@ public class PhotoGalleryFragment extends Fragment {
             Log.d(TAG, "bind position : " + position + ", url : " + galleryItem.getUrl());
 
             holder.bindDrawable(loadDrawable);
+            holder.setUrl(galleryItem.getBigSizeUrl());
+
 
             if (mMemoryCache.get(galleryItem.getUrl()) != null) {
                 Bitmap bitmap = mMemoryCache.get(galleryItem.getUrl());

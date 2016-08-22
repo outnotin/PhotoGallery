@@ -60,6 +60,7 @@ public class FlickrFetcher {
 
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String METHOD_SEARCH = "flickr.photos.search";
+    private static final String METHOD_GET_SIZES = "flickr.photos.getsizes";
 
     private String buildUrl(String method, String ... param) throws IOException{
         Uri baseUrl = Uri.parse(FLICKR_URL);
@@ -68,7 +69,7 @@ public class FlickrFetcher {
         builder.appendQueryParameter("api_key", API_KEY);
         builder.appendQueryParameter("format", "json");
         builder.appendQueryParameter("nojsoncallback", "1");
-        builder.appendQueryParameter("extras", "url_s");
+        builder.appendQueryParameter("extras", "url_s, url_z");
 
         if(METHOD_SEARCH.equalsIgnoreCase(method)){
             builder.appendQueryParameter("text", param[0]);
@@ -110,6 +111,8 @@ public class FlickrFetcher {
         }
     }
 
+
+
     public void getRecentPhotos(List<GalleryItem> items){
         try {
             String url = buildUrl(METHOD_GET_RECENT);
@@ -143,6 +146,13 @@ public class FlickrFetcher {
             }
 
             item.setUrl(jsonPhotoItem.getString("url_s"));
+
+            if(!jsonPhotoItem.has("url_z")){
+                continue;
+            }
+
+            item.setBigSizeUrl(jsonPhotoItem.getString("url_z"));
+
             newGalleryItemList.add(item);
         }
     }
