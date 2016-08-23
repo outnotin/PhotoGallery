@@ -22,4 +22,8 @@
         app:showAsAction="never"
         android:title="@string/start_polling"/>
 
+    <item android:id="@+id/mnu_manual_check"
+        android:title="@string/manual_check"
+        app:showAsAction="never"/>
+
 </menu>

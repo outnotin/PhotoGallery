@@ -9,4 +9,5 @@
     <string name="new_picture">New picture arriving</string>
     <string name="new_picture_title">New Picture title</string>
     <string name="new_picture_content">New picture content</string>
+    <string name="manual_check">Manual Check</string>
 </resources>

@@ -105,7 +105,9 @@ public class PollService extends IntentService {
             Notification notification = notiBuilder.build(); // build notification from builder
 
             NotificationManagerCompat nm = NotificationManagerCompat.from(this); //get notificationmanager from context
+//            nm.notify(newestId.hashCode(), notification);//call notification
             nm.notify(0, notification);//call notification
+//            nm.notify(Long.valueOf(newestId).intValue(), notification);
         }
 
         PhotoGalleryPreference.setStoredLastId(this, newestId);

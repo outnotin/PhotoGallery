@@ -9,12 +9,16 @@ import android.preference.PreferenceManager;
  */
 public class PhotoGalleryPreference {
     private static final String TAG = "PhotoGalleryPreference";
-    private static final String PREF_SEARCH_KEY = "PhotoGalleryPreference";
-    private static final String PREF_LAST_ID = "PREF_LAST_ID";
+    protected static final String PREF_SEARCH_KEY = "PhotoGalleryPreference";
+    protected static final String PREF_LAST_ID = "PREF_LAST_ID";
+
+    public static SharedPreferences mySharedPref(Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
 
     public static String getStoredSearchKey(Context context){
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        return pref.getString("SEARCH_KEY", null);
+//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        return mySharedPref(context).getString(PREF_SEARCH_KEY, null);
     }
 
     public static void setStoredSearchKey(Context context, String key){
@@ -25,8 +29,8 @@ public class PhotoGalleryPreference {
     }
 
     public static String getStoredLastId(Context context){
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        return pref.getString(PREF_LAST_ID, null);
+//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        return mySharedPref(context).getString(PREF_LAST_ID, null);
     }
 
     public static void setStoredLastId(Context context, String lastId){
