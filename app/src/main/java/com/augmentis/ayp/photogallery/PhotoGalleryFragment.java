@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,7 +37,7 @@ import java.util.List;
 /**
  * Created by Noppharat on 8/16/2016.
  */
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
     private static final String TAG = "PhotoGalleryFragment";
     private static final String DIALOG_IMAGE = "DialogImage";
 
@@ -66,9 +69,9 @@ public class PhotoGalleryFragment extends Fragment {
         setHasOptionsMenu(true);
 
 //        Log.d(TAG, "Start intent service");
-//        Intent i = PollService.newIntent(getActivity());
-//        getActivity().startService(i);
-//        PollService.setServiceAlarm(getContext(), true);
+        Intent i = PollService.newIntent(getActivity());
+        getActivity().startService(i);
+        PollService.setServiceAlarm(getContext(), true);
 
         Log.d(TAG, "Memory size = " + maxMemory + " K");
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -98,6 +101,8 @@ public class PhotoGalleryFragment extends Fragment {
         mThumbnailDownloaderThread.getLooper();
 
         Log.i(TAG, "Start background thread");
+
+//        PollJobService.start(getActivity());
     }
 
     public void onDestroy() {
@@ -229,7 +234,7 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
 
-    class PhotoHolder extends RecyclerView.ViewHolder{
+    class PhotoHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener{
 
         private ImageView mPhoto;
         private String mUrl;
@@ -247,6 +252,7 @@ public class PhotoGalleryFragment extends Fragment {
                     di.show(fm, DIALOG_IMAGE);
                 }
             });
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         public void bindDrawable(@NonNull Drawable drawable) {
@@ -255,6 +261,21 @@ public class PhotoGalleryFragment extends Fragment {
 
         public void setUrl(String _photoUrl){
             mUrl = _photoUrl;
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            MenuItem menuItem = menu.add(R.string.open_by_url);
+            menu.setHeaderTitle(mUrl);
+            menuItem.setOnMenuItemClickListener(this);
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+//            Toast.makeText(getActivity(),"Open by url : " + mUrl ,Toast.LENGTH_SHORT).show();
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+            startActivity(browserIntent);
+            return false;
         }
 
 //        @Override

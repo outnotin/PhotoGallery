@@ -97,7 +97,7 @@ public class DialogImage extends DialogFragment implements DialogInterface.OnCli
 
     }
 
-    class loadImageTask extends AsyncTask<String, Void, Bitmap> {
+    class loadImageTask extends AsyncTask<String, Void, Bitmap> { //param, progress, return
 
         boolean running = false;
 
