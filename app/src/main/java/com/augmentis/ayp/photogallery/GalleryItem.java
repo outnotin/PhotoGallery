@@ -1,5 +1,7 @@
 package com.augmentis.ayp.photogallery;
 
+import android.net.Uri;
+
 /**
  * Created by Noppharat on 8/16/2016.
  */
@@ -8,6 +10,7 @@ public class GalleryItem {
     private String title;
     private String url;
     private String bigSizeUrl;
+    private String mOwner;
 
 
     public static void printHello(){
@@ -62,5 +65,23 @@ public class GalleryItem {
 
     public String getBigSizeUrl() {
         return bigSizeUrl;
+    }
+
+    public void setOwner(String owner) {
+        mOwner = owner;
+    }
+
+    public String getOwner() {
+        return mOwner;
+    }
+
+    private final String PHOTO_URL_PREFIK = "https://www.flickr.com/photos/";
+
+    public Uri getPhotoUri(){
+        return Uri.parse(PHOTO_URL_PREFIK)
+                .buildUpon()            //return builder
+                .appendPath(mOwner)
+                .appendPath(id)
+                .build();               //return Uri
     }
 }

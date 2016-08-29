@@ -237,7 +237,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
     class PhotoHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener{
 
         private ImageView mPhoto;
-        private String mUrl;
+//        private String mUrl;
+        GalleryItem mGalleryItem;
 
 
         public PhotoHolder(View itemView) {
@@ -248,10 +249,11 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 public void onClick(View view) {
                     Log.d(TAG, " holder onclick");
                     FragmentManager fm = getFragmentManager();
-                    DialogImage di = DialogImage.newInstance(mUrl);
+                    DialogImage di = DialogImage.newInstance(mGalleryItem.getBigSizeUrl());
                     di.show(fm, DIALOG_IMAGE);
                 }
             });
+
             itemView.setOnCreateContextMenuListener(this);
         }
 
@@ -259,22 +261,36 @@ public class PhotoGalleryFragment extends VisibleFragment {
             mPhoto.setImageDrawable(drawable);
         }
 
-        public void setUrl(String _photoUrl){
-            mUrl = _photoUrl;
+        public void bindGalleryItem(GalleryItem galleryItem){
+            mGalleryItem = galleryItem;
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            MenuItem menuItem = menu.add(R.string.open_by_url);
-            menu.setHeaderTitle(mUrl);
+            menu.setHeaderTitle(mGalleryItem.getBigSizeUrl());
+
+            MenuItem menuItem = menu.add(0, 1, 0, R.string.open_with_external_browser);
             menuItem.setOnMenuItemClickListener(this);
+            MenuItem menuItem1 = menu.add(0, 2, 0, R.string.open_in_app_browser);
+            menuItem1.setOnMenuItemClickListener(this);
         }
 
         @Override
         public boolean onMenuItemClick(MenuItem item) {
-//            Toast.makeText(getActivity(),"Open by url : " + mUrl ,Toast.LENGTH_SHORT).show();
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
-            startActivity(browserIntent);
+//            Toast.makeText(getActivity(),"Open by url : " + mGalleryItem.getBigSizeUrl() ,Toast.LENGTH_SHORT).show();
+
+            switch (item.getItemId()){
+                case 1:
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, mGalleryItem.getPhotoUri());
+                    startActivity(browserIntent);// call external browser by implicit intent
+                    return true;
+                case 2:
+                    Intent internalIntent = PhotoPageActivity.newIntent(getActivity(), mGalleryItem.getPhotoUri());
+                    startActivity(internalIntent);// call internal activity by explicit intent
+                    return true;
+                default:
+            }
+
             return false;
         }
 
@@ -324,7 +340,7 @@ public class PhotoGalleryFragment extends VisibleFragment {
             Log.d(TAG, "bind position : " + position + ", url : " + galleryItem.getUrl());
 
             holder.bindDrawable(loadDrawable);
-            holder.setUrl(galleryItem.getBigSizeUrl());
+            holder.bindGalleryItem(galleryItem);
 
 
             if (mMemoryCache.get(galleryItem.getUrl()) != null) {

@@ -13,6 +13,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -54,7 +55,11 @@ public class FlickrFetcherAndroidTest {
 
         Log.d(TAG, "testGetRecent : size = " + galleryItemList.size());
         assertThat(galleryItemList.size(), not(0));
+        assertThat(galleryItemList.get(0).getOwner(), notNullValue());
     }
+
+
+
 
 
 }
