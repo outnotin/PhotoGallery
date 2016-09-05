@@ -13,6 +13,16 @@ public class PhotoGalleryPreference {
     protected static final String PREF_LAST_ID = "PREF_LAST_ID";
     protected static final String PREF_IS_ALARM_ON = "PREF_ALARM_ON";
 
+    private static final String PREF_USE_GPS = "use_gps";
+
+    public static Boolean getUseGPS(Context context){
+        return mySharedPref(context).getBoolean(PREF_USE_GPS, false);
+    }
+
+    public static void setUseGPS(Context context, boolean use_GPS){
+        mySharedPref(context).edit().putBoolean(PREF_USE_GPS, use_GPS).apply();
+    }
+
     public static SharedPreferences mySharedPref(Context context){
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
