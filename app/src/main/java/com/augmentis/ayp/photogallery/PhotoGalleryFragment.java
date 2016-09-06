@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -73,10 +74,14 @@ public class PhotoGalleryFragment extends VisibleFragment {
 
     private GoogleApiClient.ConnectionCallbacks mConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
         @Override
+        @SuppressWarnings("all")
         public void onConnected(@Nullable Bundle bundle) {
 //            mUseGPS = PhotoGalleryPreference.getUseGPS(getActivity());
+            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Log.i(TAG, "Last location = " + mLocation);
             if(mUseGPS){
                 findLocation();
+                loadPhoto();
             }
         }
 
@@ -90,6 +95,10 @@ public class PhotoGalleryFragment extends VisibleFragment {
         @Override
         public void onLocationChanged(Location location) {
             mLocation = location;
+
+            if(mUseGPS){
+                loadPhoto();
+            }
 
             Log.d(TAG, "onLocationChanged: " + location.getLatitude() + " , " + location.getLongitude());
             Toast.makeText(getActivity(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
@@ -195,6 +204,10 @@ public class PhotoGalleryFragment extends VisibleFragment {
         }
 
         mUseGPS = PhotoGalleryPreference.getUseGPS(getActivity());
+
+        if(!mUseGPS){
+            loadPhoto();
+        }
 //
 //        Log.d(TAG, "On resume completed, mSearchKey = " + mSearchKey + ", mUseGPS = " + mUseGPS);
 //        if(mUseGPS){
@@ -374,6 +387,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
                     FragmentManager fm = getFragmentManager();
                     DialogImage di = DialogImage.newInstance(mGalleryItem.getBigSizeUrl());
                     di.show(fm, DIALOG_IMAGE);
+
+
                 }
             });
 
@@ -382,6 +397,11 @@ public class PhotoGalleryFragment extends VisibleFragment {
 
         public void bindDrawable(@NonNull Drawable drawable) {
             mPhoto.setImageDrawable(drawable);
+
+        }
+
+        public void bindGlide(String url){
+            Glide.with(getActivity()).load(url).into(mPhoto);
         }
 
         public void bindGalleryItem(GalleryItem galleryItem){
@@ -396,6 +416,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
             menuItem.setOnMenuItemClickListener(this);
             MenuItem menuItem1 = menu.add(0, 2, 0, R.string.open_in_app_browser);
             menuItem1.setOnMenuItemClickListener(this);
+            MenuItem menuItem2 = menu.add(0, 3, 0 , R.string.open_in_map);
+            menuItem2.setOnMenuItemClickListener(this);
         }
 
         @Override
@@ -411,6 +433,15 @@ public class PhotoGalleryFragment extends VisibleFragment {
                     Intent internalIntent = PhotoPageActivity.newIntent(getActivity(), mGalleryItem.getPhotoUri());
                     startActivity(internalIntent);// call internal activity by explicit intent
                     return true;
+                case 3:
+                    Location itemLoc = null;
+                            if(mGalleryItem.isGeoCorrect()) {
+                                itemLoc = new Location("");
+                                itemLoc.setLatitude(Double.valueOf(mGalleryItem.getmLat()));
+                                itemLoc.setLongitude(Double.valueOf(mGalleryItem.getmLon()));
+                            }
+                    Intent mapIntent = PhotoMapActivity.newIntent(getActivity(), mLocation,itemLoc, mGalleryItem.getUrl());
+                    startActivity(mapIntent);
                 default:
             }
 
@@ -462,8 +493,10 @@ public class PhotoGalleryFragment extends VisibleFragment {
             GalleryItem galleryItem = mGalleryItemList.get(position);
 //            Log.d(TAG, "bind position : " + position + ", url : " + galleryItem.getUrl());
 
-            holder.bindDrawable(loadDrawable);
+//            holder.bindDrawable(loadDrawable);
+            holder.bindGlide(galleryItem.getBigSizeUrl());
             holder.bindGalleryItem(galleryItem);
+
 
 
             if (mMemoryCache.get(galleryItem.getUrl()) != null) {

@@ -11,7 +11,24 @@ public class GalleryItem {
     private String url;
     private String bigSizeUrl;
     private String mOwner;
+    private String mLat;
+    private String mLon;
 
+    public String getmLat() {
+        return mLat;
+    }
+
+    public void setmLat(String mLat) {
+        this.mLat = mLat;
+    }
+
+    public String getmLon() {
+        return mLon;
+    }
+
+    public void setmLon(String mLon) {
+        this.mLon = mLon;
+    }
 
     public static void printHello(){
         System.out.println("Hello");
@@ -83,5 +100,9 @@ public class GalleryItem {
                 .appendPath(mOwner)
                 .appendPath(id)
                 .build();               //return Uri
+    }
+
+    public boolean isGeoCorrect(){
+        return !("0".equals(mLat) && "0".equals(mLon));
     }
 }

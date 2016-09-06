@@ -15,12 +15,20 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <!-- Map -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDAFGrcMWaZRfL3mw82Ze9_bdR6tljul0c"/>
+
         <activity android:name=".PhotoGalleryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +36,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
 
         <activity android:name=".PhotoPageActivity"
             android:label="@string/in_app_browser"
@@ -39,6 +49,13 @@
         <!-- Setting -->
         <activity android:name=".SettingActivity"
             android:label="@string/photo_setting"
+            android:parentActivityName=".PhotoGalleryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+
+        </activity>
+
+        <activity android:name=".PhotoMapActivity"
+            android:label="@string/photo_map"
             android:parentActivityName=".PhotoGalleryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
 
